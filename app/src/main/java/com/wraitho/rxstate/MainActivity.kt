@@ -9,6 +9,7 @@ import com.jakewharton.rxbinding2.view.clicks
 import com.wraitho.rxstate.uimodel.UiModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.toast
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     @Inject lateinit var factory: MyPresenter.Factory
+    lateinit var disposable: Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +27,18 @@ class MainActivity : AppCompatActivity() {
 
         val presenter = ViewModelProviders.of(this, factory).get(MyPresenter::class.java)
 
-        val uiEvents: Observable<UiEvent> = Observable.merge(
+        val uiEvents = Observable.merge(
                 login.clicks().map { LoginClick(user.text.toString(), pass.text.toString()) }.doOnNext { login.hideKeyboard() },
                 forgot.clicks().map { ForgotPassClick(user.text.toString()) })
-        uiEvents.subscribe(presenter.uiEvents)
+
+        disposable = uiEvents.subscribe {presenter.uiEvents.onNext(it)}
 
         presenter.uiModelObservable.observeOn(AndroidSchedulers.mainThread()).subscribe(this::render)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.dispose()
     }
 
     private fun render(uiModel: UiModel) {
