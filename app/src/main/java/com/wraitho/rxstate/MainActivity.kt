@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun render(uiModel: UiModel) {
         progress.visibility = if (uiModel.inProgress) VISIBLE else GONE
+        login.isEnabled = !uiModel.inProgress
+        forgot.isEnabled = !uiModel.inProgress
 
         if (uiModel.userName != null) {
             toast("Logged in dear " + uiModel.userName)
