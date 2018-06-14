@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MyPresenter(repository: MyRepository) : ViewModel() {
 
     val uiEvents: PublishSubject<UiEvent> = PublishSubject.create<UiEvent>()
-    var currentState = UiModel(null, false, null)
+    private var currentState = UiModel(null, false, null)
 
     private val transformer: ObservableTransformer<UiEvent, UiModel>
     init {
@@ -85,14 +85,14 @@ class MyPresenter(repository: MyRepository) : ViewModel() {
         return currentState
     }
 
-    class Factory @Inject constructor(val repository: MyRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>?): T {
+    class Factory @Inject constructor(private val repository: MyRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             @Suppress("UNCHECKED_CAST")
             return MyPresenter(repository) as T
         }
     }
 
-    fun log(what: String) {
+    private fun log(what: String) {
         Log.d("RxState", what)
     }
 

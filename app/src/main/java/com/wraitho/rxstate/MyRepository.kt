@@ -11,12 +11,12 @@ import javax.inject.Inject
 class MyRepository @Inject constructor() {
     fun getAccount(user: String, pass: String): Observable<User> {
         Log.d("RxState", "getting the account")
-        if ("bla".equals(user, ignoreCase = true) && "bla".equals(pass, ignoreCase = true)) {
+        return if ("bla".equals(user, ignoreCase = true) && "bla".equals(pass, ignoreCase = true)) {
             Log.d("RxState", "COOL")
-            return Observable.fromArray(User("bla", "bla")).delay(3, TimeUnit.SECONDS)
+            Observable.fromArray(User("bla", "bla")).delay(3, TimeUnit.SECONDS)
         } else {
             Log.d("RxState", "NOT SO COOL")
-            return Observable.error(WrongCredentials())
+            Observable.error(WrongCredentials())
         }
     }
 
